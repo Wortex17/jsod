@@ -15,5 +15,9 @@
     "configurable"
   ],
   "license": "MIT",
-  "author": "Patrick Michael Hopf (https://github.com/Wortex17)"
+  "author": "Patrick Michael Hopf (https://github.com/Wortex17)",
+
+  "dependencies": {
+    "lodash": "^4.6.1"
+  }
 }
