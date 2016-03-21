@@ -1,6 +1,8 @@
 # jsod
 Diff, diff3 and patch objects of any fundamental or derived type, natively in javascript
 
+`This is still a playground version and under heavy cleanup and development`
+
 Jsod (**J**ava**S**cript **O**bject **D**iff) is a configurable and extendable
 module that allows to create diffs (also known as deltas) of pure
 javascript-native objects and primitives like object,
