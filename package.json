@@ -16,7 +16,10 @@
   ],
   "license": "MIT",
   "author": "Patrick Michael Hopf (https://github.com/Wortex17)",
-
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wortex17/jsod.git"
+  },
   "dependencies": {
     "lodash": "^4.6.1"
   }
