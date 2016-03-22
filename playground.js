@@ -1,9 +1,15 @@
-/**
- * Created by Patrick on 14.03.2016.
+/*!
+ * jsod
+ * https://github.com/wortex17/jsod
+ * Created 14.03.2016 by Patrick Michael Hopf
+ *
+ * Released under The MIT License
  */
 "use strict";
 
-var util = require('util');
+var
+    util = require('util')
+    ;
 var
     _ = require('lodash')
     ;
