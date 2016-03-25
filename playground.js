@@ -14,7 +14,7 @@ var
     _ = require('lodash')
     ;
 var
-    differ = require('./lib')
+    jsod = require('./lib')
     ;
 
 var obj = {
@@ -80,12 +80,12 @@ let t_origin = obj;
 let t_changed = obj2;
 let t_changed2 = obj3;
 
-let delta = differ.diff(t_origin, t_changed);
-let delta2 = differ.diff(t_origin, t_changed2);
+let delta = jsod.diff(t_origin, t_changed);
+let delta2 = jsod.diff(t_origin, t_changed2);
 
 /*/
 console.log(util.inspect(delta, {showHidden: false, depth: null}));
-let patched = differ.patchClone(t_origin, delta);
+let patched = jsod.patchClone(t_origin, delta);
 console.log(patched);
 /**/
 
@@ -99,10 +99,10 @@ console.log();
 /**/
 
 let conflicts = [];
-let combined = differ.mergeDeltas(delta, delta2, conflicts);
+let combined = jsod.mergeDeltas(delta, delta2, conflicts);
 console.log("COMB", util.inspect(combined, {showHidden: false, depth: null}));
 console.log("CONF", util.inspect(conflicts, {showHidden: false, depth: null}));
-let patched = differ.patchClone(t_origin, combined);
+let patched = jsod.patchClone(t_origin, combined);
 console.log(patched);
 //console.log(patched);
 /**/
