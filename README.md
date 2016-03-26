@@ -89,6 +89,23 @@ var delta = jsod.diff(a, b);
 var a2 = jsod.patchClone(a, delta); //ab resembles b while a did not change
 ```
 
+#### `mergeDeltas(deltaA, deltaB [, config [, conflictNodes [, parentPath]]])`
+Creates a new DeltaTree that contains the combined deltas from
+deltaA and deltaB. Conflicts will be stored in a DeltaTreeNode under the `!` property.
+To quickly iterate all the conflicts, you may give an array for `conflictNodes`, which will
+be filled with objects pointing to the nodes and the path of the merged node itself.
+```javascript
+var deltaA = jsod.diff(o, a);
+var deltaB = jsod.diff(o, b);
+let combined = jsod.mergeDeltas(deltaA, deltaB, null, conflicts);
+```
+You may want to merge a subtree, e.g. when resolving conflicts. For this purpose,
+you can pass the `parentPath` parameter, to which all found paths in given deltas
+will be seen as relative to. Otherwise, the conflicts array might be filled
+with the wrong paths.  
+Conflicts stored in the nodes' `!` property are ignored when patching,
+so you can simply ignore conflicts if you wish to.
+
 ## Why another diff tool?
 Although there are many text-based diff modules available, creating diffs of javascript
 objects (or any other language specific data) often requires specialized
