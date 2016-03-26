@@ -77,7 +77,7 @@ mutating it.
 Returns the patched target.
 ```javascript
 var delta = jsod.diff(a, b);
-a = jsod.patch(a, delta); //a now resmbles b
+a = jsod.patch(a, delta); //a now resembles b
 ```
 
 #### `patchClone(target, delta)`
@@ -97,7 +97,15 @@ be filled with objects pointing to the nodes and the path of the merged node its
 ```javascript
 var deltaA = jsod.diff(o, a);
 var deltaB = jsod.diff(o, b);
+var conflicts = [];
 let combined = jsod.mergeDeltas(deltaA, deltaB, null, conflicts);
+console.log(conflicts);
+/*
+[ {
+    path: [ 'sub', 'subsub' ],
+    node: { '!': [ { conflictType: 'sameOpDiffVal', A: [ 'subsub', '~', 43 ], B: [ 'subsub', '~', 41 ] } ] } 
+    } ]
+*/
 ```
 You may want to merge a subtree, e.g. when resolving conflicts. For this purpose,
 you can pass the `parentPath` parameter, to which all found paths in given deltas
