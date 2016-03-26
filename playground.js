@@ -99,7 +99,7 @@ console.log();
 /**/
 
 let conflicts = [];
-let combined = jsod.mergeDeltas(delta, delta2, conflicts);
+let combined = jsod.mergeDeltas(delta, delta2, null, conflicts);
 console.log("COMB", util.inspect(combined, {showHidden: false, depth: null}));
 console.log("CONF", util.inspect(conflicts, {showHidden: false, depth: null}));
 let patched = jsod.patchClone(t_origin, combined);
