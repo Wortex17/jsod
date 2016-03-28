@@ -27,7 +27,7 @@
   "main": "lib",
   "scripts": {
     "test": "mocha spec",
-    "test-cover": "istanbul cover node_modules\\mocha\\bin\\_mocha -- spec",
+    "test-cover": "istanbul cover node_modules/mocha/bin/_mocha -- spec",
     "preversion": "npm test",
     "prepublish": "npm test"
   },
