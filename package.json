@@ -20,6 +20,7 @@
     "type": "git",
     "url": "git://github.com/wortex17/jsod.git"
   },
+  "main": "lib",
   "dependencies": {
     "lodash": "^4.6.1"
   }

@@ -14,7 +14,7 @@ var
     _ = require('lodash')
     ;
 var
-    jsod = require('./lib')
+    jsod = require('.')
     ;
 
 var obj = {
@@ -96,10 +96,13 @@ console.log(util.inspect(delta2, {showHidden: false, depth: null}));
 console.log();
 /**/
 
-/**/
-
+/*/
 let conflicts = [];
 let combined = jsod.mergeDeltas(delta, delta2, null, conflicts);
+/**/
+let conflicts = [];
+let combined = jsod.diff3(t_changed, t_origin, t_changed, null, null, conflicts);
+/**/
 console.log("COMB", util.inspect(combined, {showHidden: false, depth: null}));
 console.log("CONF", util.inspect(conflicts, {showHidden: false, depth: null}));
 let patched = jsod.patchClone(t_origin, combined);
