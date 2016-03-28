@@ -26,7 +26,9 @@
   },
   "main": "lib",
   "scripts": {
-    "test": "mocha spec"
+    "test": "mocha spec",
+    "preversion": "npm test",
+    "prepublish": "npm test"
   },
   "dependencies": {
     "lodash": "^4.6.1"
