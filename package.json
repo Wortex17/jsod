@@ -16,12 +16,23 @@
   ],
   "license": "MIT",
   "author": "Patrick Michael Hopf (https://github.com/Wortex17)",
+  "homepage": "https://github.com/Wortex17/jsod#readme",
   "repository": {
     "type": "git",
     "url": "git://github.com/wortex17/jsod.git"
   },
+  "bugs": {
+    "url": "https://github.com/Wortex17/jsod/issues"
+  },
   "main": "lib",
+  "scripts": {
+    "test": "mocha spec"
+  },
   "dependencies": {
     "lodash": "^4.6.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
   }
 }
