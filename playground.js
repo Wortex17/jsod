@@ -46,18 +46,18 @@ var obj2 = _.extend({}, obj, {
     float: '17.7',
     array: [0,2,3, {x: 'x', y: 'y'}],
     buffer: new Buffer("buf!e"),/*
-    regex: /magpi2e/i,
-    func: function(){return true;},
-    child: {
-        'A': 'A',
-        'B': 'b',
-        'C': 'c',
-        'X': {
-            Y: 'y'
-        }
-    },
-    typedArray: new Uint8Array(3),
-    arrayBuffer: new ArrayBuffer(3)*/
+     regex: /magpi2e/i,
+     func: function(){return true;},
+     child: {
+     'A': 'A',
+     'B': 'b',
+     'C': 'c',
+     'X': {
+     Y: 'y'
+     }
+     },
+     typedArray: new Uint8Array(3),
+     arrayBuffer: new ArrayBuffer(3)*/
 });
 delete obj2.bool;
 
@@ -66,11 +66,11 @@ var obj3 = _.extend({}, obj, {
     string: "barfoo",
     array: [0,2,2, {x: 'x', y: 'y'}],
     buffer: new Buffer("buff!"),/*
-    child: {
-        'A': 'a',
-        'B': 'B',
-        'C': 'c'
-    }*/
+     child: {
+     'A': 'a',
+     'B': 'B',
+     'C': 'c'
+     }*/
 });
 delete obj3.bool;
 
@@ -84,28 +84,46 @@ let delta = jsod.diff(t_origin, t_changed);
 let delta2 = jsod.diff(t_origin, t_changed2);
 
 /*/
-console.log(util.inspect(delta, {showHidden: false, depth: null}));
-let patched = jsod.patchClone(t_origin, delta);
-console.log(patched);
-/**/
+ console.log(util.inspect(delta, {showHidden: false, depth: null}));
+ let patched = jsod.patchClone(t_origin, delta);
+ console.log(patched);
+ /**/
 
 /*/
-console.log(util.inspect(delta, {showHidden: false, depth: null}));
-console.log();
-console.log(util.inspect(delta2, {showHidden: false, depth: null}));
-console.log();
-/**/
+ console.log(util.inspect(delta, {showHidden: false, depth: null}));
+ console.log();
+ console.log(util.inspect(delta2, {showHidden: false, depth: null}));
+ console.log();
+ /**/
 
 /*/
-let conflicts = [];
-let combined = jsod.mergeDeltas(delta, delta2, null, conflicts);
+ let conflicts = [];
+ let combined = jsod.mergeDeltas(delta, delta2, null, conflicts);
 /**/
 let conflicts = [];
-let combined = jsod.diff3(t_changed, t_origin, t_changed, null, null, conflicts);
+let combined = jsod.diff3(t_changed, t_origin, t_changed2, null, null, conflicts);
 /**/
 console.log("COMB", util.inspect(combined, {showHidden: false, depth: null}));
 console.log("CONF", util.inspect(conflicts, {showHidden: false, depth: null}));
+/**/
+for(let i = 0; i < conflicts.length; i++)
+{
+    let conflictMarker = conflicts[i];
+    let node = conflictMarker.node;
+    let localConflicts = node['!'];
+    for(let c = 0; c < localConflicts.length; c++)
+    {
+        let localConflict = localConflicts[c];
+        console.log("Conflict "+c+" at " + conflictMarker.path, "\tType:" + localConflict.conflictType);
+        if(!_.isArray(node['.']))
+        {
+            node['.'] = [];
+        }
+        console.log("Resolving using B\t", localConflict.B);
+        node['.'].push(localConflict.B);
+    }
+}
+/**/
 let patched = jsod.patchClone(t_origin, combined);
 console.log(patched);
-//console.log(patched);
 /**/
