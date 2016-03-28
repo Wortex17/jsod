@@ -34,3 +34,4 @@ node_modules
 
 # IDEA (Web/PhpStorm)
 .idea
+playground.js
