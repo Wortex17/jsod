@@ -114,6 +114,17 @@ with the wrong paths.
 Conflicts stored in the nodes' `!` property are ignored when patching,
 so you can simply ignore conflicts if you wish to.
 
+#### `diff3(changedA, origin, changedB, [, diffConfig [, mergeConfig [, conflictNodes]]])`
+Creates a new DeltaTree that contains the combined deltas from origin to changedA and changedB.
+Conflicts will be stored in a DeltaTreeNode under the `!` property.
+To quickly iterate all the conflicts, you may give an array for `conflictNodes`, which will
+be filled with objects pointing to the nodes and the path of the merged node itself.
+```javascript
+let conflicts = [];
+let deltaAB = jsod.diff3(a, o, b, null, null, conflicts);
+```
+See `mergeDeltas` for more details about merge configuration
+
 ## Why another diff tool?
 Although there are many text-based diff modules available, creating diffs of javascript
 objects (or any other language specific data) often requires specialized
