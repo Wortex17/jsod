@@ -1,8 +1,11 @@
 "use strict";
 
-let _ = require('lodash');
-let chai = require('chai');
-let expect = chai.expect;
+let
+    _ = require('lodash')
+    ,chai = require('chai')
+    ,expect = chai.expect
+;
+
 let gen = require('../spec-tools/object-generator');
 
 describe('Self-Test: Object Generator', function() {
