@@ -45,17 +45,18 @@ var obj2 = _.extend({}, obj, {
     newInt: 17,
     float: '17.7',
     array: [0,2,3, {x: 'x', y: 'y'}],
-    buffer: new Buffer("buf!e"),/*
+    buffer: new Buffer("buf!e"),
+    child: {
+        'A': 'A',
+        'B': 'b',
+        'C': 'c',
+        'X': {
+            Y: 'y'
+        }
+    }
+    /*
      regex: /magpi2e/i,
      func: function(){return true;},
-     child: {
-     'A': 'A',
-     'B': 'b',
-     'C': 'c',
-     'X': {
-     Y: 'y'
-     }
-     },
      typedArray: new Uint8Array(3),
      arrayBuffer: new ArrayBuffer(3)*/
 });
@@ -65,13 +66,15 @@ var obj3 = _.extend({}, obj, {
     int: 41,
     string: "barfoo",
     array: [0,2,2, {x: 'x', y: 'y'}],
-    buffer: new Buffer("buff!"),/*
+    buffer: new Buffer("buff!"),
+    /*
      child: {
      'A': 'a',
      'B': 'B',
      'C': 'c'
      }*/
 });
+delete obj3.child;
 delete obj3.bool;
 
 
@@ -108,6 +111,7 @@ console.log("CONF", util.inspect(conflicts, {showHidden: false, depth: null}));
 /**/
 for(let i = 0; i < conflicts.length; i++)
 {
+    let alwaysResolveWith = 'B';
     let conflictMarker = conflicts[i];
     let node = conflictMarker.node;
     let localConflicts = node['!'];
@@ -115,12 +119,18 @@ for(let i = 0; i < conflicts.length; i++)
     {
         let localConflict = localConflicts[c];
         console.log("Conflict "+c+" at " + conflictMarker.path, "\tType:" + localConflict.conflictType);
-        if(!_.isArray(node['.']))
+
+        console.log("Resolving using "+alwaysResolveWith+"...\t", localConflict[alwaysResolveWith]);
+        if(localConflict.conflictType == jsod.Attributes.ConflictType.TREE_DIFF_STRUCTURE)
         {
-            node['.'] = [];
+            _.extend(node, localConflict[alwaysResolveWith]);
+        } else {
+            if(!_.isArray(node['.']))
+            {
+                node['.'] = [];
+            }
+            node['.'].push(localConflict[alwaysResolveWith]);
         }
-        console.log("Resolving using B\t", localConflict.B);
-        node['.'].push(localConflict.B);
     }
 }
 /**/
