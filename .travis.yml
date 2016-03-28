@@ -1,0 +1,16 @@
+os:
+  - linux
+language: node_js
+node_js:
+  - "stable"
+  - "5"
+  - "5.1"
+  - "4"
+  - "4.2"
+  - "4.1"
+  - "4.0"
+  - "0.12"
+  - "iojs"
+before_script:
+  - npm install -g istanbul
+script: npm test-cover
