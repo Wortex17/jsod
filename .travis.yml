@@ -13,4 +13,4 @@ node_js:
   - "iojs"
 before_script:
   - npm install -g istanbul
-script: npm test-cover
+script: npm run-script test-cover
