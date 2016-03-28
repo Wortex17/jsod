@@ -1,6 +1,6 @@
 {
   "name": "jsod",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Diff, diff3 and patch objects of any fundamental or derived type, natively in javascript",
   "keywords": [
     "diff",
