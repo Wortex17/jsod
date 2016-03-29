@@ -2,9 +2,9 @@
 Diff, diff3 and patch objects of any fundamental or derived type, natively in javascript
 
 [![Build Status](https://travis-ci.org/Wortex17/jsod.svg?branch=master)](https://travis-ci.org/Wortex17/jsod)
-[![Coverage Status](https://coveralls.io/repos/github/Wortex17/jsod/badge.svg?branch=feature%2Ftravis-ci)](https://coveralls.io/github/Wortex17/jsod?branch=feature%2Ftravis-ci)  
+[![Coverage Status](https://coveralls.io/repos/github/Wortex17/jsod/badge.svg?branch=master)](https://coveralls.io/github/Wortex17/jsod?branch=master)  
 [![NPM Version](https://img.shields.io/npm/v/jsod.svg)](https://www.npmjs.com/package/jsod)
-[![NPM Dependencies](https://david-dm.org/Wortex17/jsod.svg)](https://www.npmjs.com/package/jsod)
+[![NPM Dependencies](https://img.shields.io/david/Wortex17/jsod.svg)](https://www.npmjs.com/package/jsod)
 [![NPM Dev Dependencies](https://img.shields.io/david/dev/Wortex17/jsod.svg)](https://www.npmjs.com/package/jsod)
 
 Jsod (**J**ava**S**cript **O**bject **D**iff) is a configurable and extendable
