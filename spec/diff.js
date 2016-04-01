@@ -10,6 +10,535 @@ let gen = require('../spec-tools/object-generator');
 
 let jsod = require('../');
 
+
+describe('jsod#diff()', function() {
+
+    describeValueTypeDiffSuite("booleans", gen.bool, gen.boolAlt);
+    describeValueTypeDiffSuite("integers", gen.int, gen.intAlt);
+    describeValueTypeDiffSuite("decimals", gen.float, gen.floatAlt);
+    describeValueTypeDiffSuite("infinity", gen.inf, gen.ninf);
+    describeValueTypeDiffSuite("integers", gen.int, gen.intAlt);
+    describeValueTypeDiffSuite("strings", gen.string, gen.stringAlt);
+    describeValueTypeDiffSuite("dates", gen.date, gen.dateAlt);
+    describeValueTypeDiffSuite("regex", gen.regex, gen.regexAlt);
+    describeValueTypeDiffSuite("functions", gen.func, gen.funcAlt);
+
+});
+
+function describeValueTypeDiffSuite(readableName, generateValue, generateAltValue)
+{
+    describe("diffing " + readableName, function(){
+        describe("direct " + readableName, function(){
+
+            context('when value has been set', function () {
+                let O = undefined;
+                let A = generateAltValue();
+                let diff = jsod.diff(O, A);
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return one record at root level', function() {
+                    expect(diff['.']).to.be.a('array');
+                    expect(diff['.']).to.have.length(1);
+                    expect(diff['.'][0]).to.be.a('array');
+                });
+                it('should return no subtrees at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should record with undefined key name', function() {
+                    expect(diff['.'][0][0]).to.satisfy(_.isUndefined);
+                });
+                it('should record a ADD operation', function() {
+                    expect(diff['.'][0]).to.have.length(3);
+                    expect(diff['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.ADD);
+                });
+                it('should record the new value', function() {
+                    expect(diff['.'][0][2]).to.equal(A);
+                });
+            });
+
+            context('when value has not changed', function () {
+                let O = generateValue();
+                let A = generateValue();
+                let diff = jsod.diff(O, A);
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return no subtrees at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+            });
+
+            context('when value has changed', function () {
+                let O = generateValue();
+                let A = generateAltValue();
+                let diff = jsod.diff(O, A);
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return one record at root level', function() {
+                    expect(diff['.']).to.be.a('array');
+                    expect(diff['.']).to.have.length(1);
+                    expect(diff['.'][0]).to.be.a('array');
+                });
+                it('should return no subtrees at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should record with undefined key name', function() {
+                    expect(diff['.'][0][0]).to.satisfy(_.isUndefined);
+                });
+                it('should record a MODIFY operation', function() {
+                    expect(diff['.'][0]).to.have.length(3);
+                    expect(diff['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.MODIFY);
+                });
+                it('should record the new value', function() {
+                    expect(diff['.'][0][2]).to.satisfy(function deepEqual(x){
+                        return _.isEqual(x, A);
+                    });
+                });
+            });
+
+            context('when value has been deleted', function () {
+                let O = generateValue();
+                let A = undefined;
+                let diff = jsod.diff(O, A);
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return one record at root level', function() {
+                    expect(diff['.']).to.be.a('array');
+                    expect(diff['.']).to.have.length(1);
+                    expect(diff['.'][0]).to.be.a('array');
+                });
+                it('should return no subtrees at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should record with undefined key name', function() {
+                    expect(diff['.'][0][0]).to.satisfy(_.isUndefined);
+                });
+                it('should record a DELETE operation', function() {
+                    expect(diff['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.DELETE);
+                });
+                it('should not record the changed value', function() {
+                    expect(diff['.'][0]).to.have.length(2);
+                    expect(diff['.'][0][2]).to.satisfy(_.isUndefined);
+                });
+            });
+
+        });
+        describe(readableName + " nested in object", function(){
+
+            let level1Key = 'level1';
+
+            context('when value has been set', function () {
+                let O = undefined;
+                let A = generateAltValue();
+                let diff = jsod.diff({}, {[level1Key]: A});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at root level', function() {
+                    expect(diff['/']).to.be.a('object');
+                    expect(Object.keys(diff['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+                it('should return no subtrees at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+                it('should return one record at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.']).to.be.a('array');
+                    expect(subtree['.']).to.have.length(1);
+                    expect(subtree['.'][0]).to.be.a('array');
+                });
+                it('should record with property name as key name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0][0]).to.equal(level1Key);
+                });
+                it('should record a ADD operation', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0]).to.have.length(3);
+                    expect(subtree['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.ADD);
+                });
+                it('should record the new value', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0][2]).to.equal(A);
+                });
+            });
+
+            context('when value has not changed', function () {
+                let O = generateValue();
+                let A = generateValue();
+                let diff = jsod.diff({[level1Key]: O}, {[level1Key]: A});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return no subtrees at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+            });
+
+            context('when value has changed', function () {
+                let O = generateValue();
+                let A = generateAltValue();
+                let diff = jsod.diff({[level1Key]: O}, {[level1Key]: A});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at root level', function() {
+                    expect(diff['/']).to.be.a('object');
+                    expect(Object.keys(diff['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+                it('should return no subtrees at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+                it('should return one record at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.']).to.be.a('array');
+                    expect(subtree['.']).to.have.length(1);
+                    expect(subtree['.'][0]).to.be.a('array');
+                });
+                it('should record with property name as key name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0][0]).to.equal(level1Key);
+                });
+                it('should record a MODIFY operation', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0]).to.have.length(3);
+                    expect(subtree['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.MODIFY);
+                });
+                it('should record the new value', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0][2]).to.satisfy(function deepEqual(x){
+                        return _.isEqual(x, A);
+                    });
+                });
+            });
+
+            context('when value has been deleted', function () {
+                let O = generateValue();
+                let A = generateAltValue();
+                let diff = jsod.diff({[level1Key]: O}, {});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at root level', function() {
+                    expect(diff['/']).to.be.a('object');
+                    expect(Object.keys(diff['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+                it('should return no subtrees at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+                it('should return one record at the subtree with the property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.']).to.be.a('array');
+                    expect(subtree['.']).to.have.length(1);
+                    expect(subtree['.'][0]).to.be.a('array');
+                });
+                it('should record with property name as key name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0][0]).to.equal(level1Key);
+                });
+                it('should record a DELETE operation', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0]).to.have.length(2);
+                    expect(subtree['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.DELETE);
+                });
+                it('should not record the new value', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.'][0]).to.have.length(2);
+                    expect(subtree['.'][0][2]).to.satisfy(_.isUndefined);
+                });
+            });
+
+        });
+        describe(readableName + " nested in object in object", function(){
+
+            let level1Key = 'level1';
+            let level2Key = 'level2';
+
+            context('when value has been set', function () {
+                let O = undefined;
+                let A = generateAltValue();
+                let diff = jsod.diff({[level1Key]: {}}, {[level1Key]: {[level2Key]: A}});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at root level', function() {
+                    expect(diff['/']).to.be.a('object');
+                    expect(Object.keys(diff['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should return no records at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['/']).to.be.a('object');
+                    expect(Object.keys(subtree['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should return no subtrees at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should return one record at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.']).to.be.a('array');
+                    expect(subtree['.']).to.have.length(1);
+                    expect(subtree['.'][0]).to.be.a('array');
+                });
+                it('should record with property name as key name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0][0]).to.equal(level2Key);
+                });
+                it('should record a ADD operation', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0]).to.have.length(3);
+                    expect(subtree['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.ADD);
+                });
+                it('should record the new value', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0][2]).to.equal(A);
+                });
+            });
+
+            context('when value has not changed', function () {
+                let O = generateValue();
+                let A = generateValue();
+                let diff = jsod.diff({[level1Key]: {[level2Key]: O}}, {[level1Key]: {[level2Key]: A}});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return no subtrees at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['/']).to.satisfy(_.isUndefined);
+                });
+            });
+
+            context('when value has changed', function () {
+                let O = generateValue();
+                let A = generateAltValue();
+                let diff = jsod.diff({[level1Key]: {[level2Key]: O}}, {[level1Key]: {[level2Key]: A}});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at root level', function() {
+                    expect(diff['/']).to.be.a('object');
+                    expect(Object.keys(diff['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+
+
+
+                it('should return no records at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['/']).to.be.a('object');
+                    expect(Object.keys(subtree['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should return no subtrees at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should return one record at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.']).to.be.a('array');
+                    expect(subtree['.']).to.have.length(1);
+                    expect(subtree['.'][0]).to.be.a('array');
+                });
+                it('should record with property name as key name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0][0]).to.equal(level2Key);
+                });
+                it('should record a MODIFY operation', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0]).to.have.length(3);
+                    expect(subtree['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.MODIFY);
+                });
+                it('should record the new value', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0][2]).to.satisfy(function deepEqual(x){
+                        return _.isEqual(x, A);
+                    });
+                });
+            });
+
+            context('when value has been deleted', function () {
+                let O = generateValue();
+                let A = generateAltValue();
+                let diff = jsod.diff({[level1Key]: {[level2Key]: O}}, {[level1Key]: {}});
+
+                it('should return a DiffTree object', function() {
+                    expect(diff).to.be.a('object');
+                });
+                it('should return no records at root level', function() {
+                    expect(diff['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at root level', function() {
+                    expect(diff['/']).to.be.a('object');
+                    expect(Object.keys(diff['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at root level', function() {
+                    expect(diff['!']).to.satisfy(_.isUndefined);
+                });
+
+
+                it('should return no records at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['.']).to.satisfy(_.isUndefined);
+                });
+                it('should return one subtree at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['/']).to.be.a('object');
+                    expect(Object.keys(subtree['/'])).to.have.length(1);
+                });
+                it('should return no conflicts at the subtree with the 1st property name', function() {
+                    let subtree = diff['/'][level1Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should return no subtrees at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['/']).to.satisfy(_.isUndefined);
+                });
+                it('should return no conflicts at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['!']).to.satisfy(_.isUndefined);
+                });
+
+                it('should return one record at the subtree with the 2nd property name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.']).to.be.a('array');
+                    expect(subtree['.']).to.have.length(1);
+                    expect(subtree['.'][0]).to.be.a('array');
+                });
+                it('should record with property name as key name', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0][0]).to.equal(level2Key);
+                });
+                it('should record a DELETE operation', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0]).to.have.length(2);
+                    expect(subtree['.'][0][1]).to.equal(jsod.Attributes.DeltaOperation.DELETE);
+                });
+                it('should not record the new value', function() {
+                    let subtree = diff['/'][level1Key]['/'][level2Key];
+                    expect(subtree['.'][0]).to.have.length(2);
+                    expect(subtree['.'][0][2]).to.satisfy(_.isUndefined);
+                });
+            });
+
+        });
+    });
+}
+
 function simpleDiffSuite(generator)
 {
     function testsForOisA(generator)
@@ -251,20 +780,3 @@ function unorderedListDiffSuite(generator)
 
     });
 }
-
-describe('jsod#diff()', function() {
-    describe("Simple primitive diffs", function(){
-
-        _.forEach(gen, function(generator){
-            if(generator.isSimpleGen && !generator.isAlternate && !generator.isValuelist)
-            {
-                simpleDiffSuite(generator);
-            }
-        })
-    });
-    describe("Unordered Valuelist diffs", function(){
-        unorderedListDiffSuite(gen.abcArray);
-        //unorderedListDiffSuite(gen.arrayBuffer);
-        //unorderedListDiffSuite(gen.typedArray);
-    });
-});
