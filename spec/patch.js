@@ -20,7 +20,7 @@ describe('jsod#patch()', function() {
                 if(generator == gen.abcArray)
                 {
                     describeUnorderedPatchEquality(generator, generator.methodName+'s');
-                } else {
+                } else if(generator != gen.func) {
                     describeSimplePatchEquality(generator, generator.methodName+'s');
                 }
             }

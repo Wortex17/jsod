@@ -21,7 +21,7 @@ describe('jsod#diff()', function() {
     describeValueTypeDiffSuite("strings", gen.string, gen.stringAlt);
     describeValueTypeDiffSuite("dates", gen.date, gen.dateAlt);
     describeValueTypeDiffSuite("regex", gen.regex, gen.regexAlt);
-    describeValueTypeDiffSuite("functions", gen.func, gen.funcAlt);
+    //describeValueTypeDiffSuite("functions", gen.func, gen.funcAlt);
 
     describeUnorderedValuelistDiffSuite();
     describeOrderedListDiffSuite();
