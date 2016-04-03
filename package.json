@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-spies": "^0.7.1",
     "coveralls": "^2.11.9",
     "mocha": "^2.4.5"
   }
