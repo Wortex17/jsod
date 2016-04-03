@@ -16,6 +16,13 @@ a common origin object and two different altered versions,
 allowing to merge distributed modifications of the same object,
 including detection of conflicts.
 
+## Changes in 0.2.0-1
+- Added specs for the full common API
+- Fix bug when patching deletes on some ordered lists
+- Fix bug when patching reference types at root level
+- Fix all configs besides Default, which were heavily broken
+- Fix bug where records were not deep cloned for merge
+
 ## Installation
 To install the latest version available on npm:
 ```
