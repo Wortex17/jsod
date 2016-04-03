@@ -8,11 +8,8 @@ let
     ;
 chai.use(spies);
 
-let gen = require('../spec-tools/object-generator');
-
 let jsod = require('../');
 
-/*
 describe('jsod#diff3()', function() {
 
     let diff_spy = chai.spy.on(jsod, 'diff');
@@ -82,4 +79,3 @@ describe('jsod#diff3()', function() {
         return configParams;
     }
 });
-*/
