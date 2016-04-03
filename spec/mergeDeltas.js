@@ -303,6 +303,9 @@ describe('jsod#mergeDeltas()', function() {
         let dataForms = {
             "_": {}, //empty (not missing! missing will be undefined anyway)
             'a': {a: "a"},
+            'aa': {a: {a: "a"}},
+            'aaa': {a: {a: {a: "a"}}},
+            'aa2': {a: {a: "a2"}},
             'a2': {a: "a2"},
             'a3': {a: "a3"},
             'b': {b: "b"},
@@ -655,6 +658,83 @@ describe('jsod#mergeDeltas()', function() {
                         expect(record0).to.be.not.equal(deltaB['/'][key]['.'][0]);
                     }
                 });
+            });
+        });
+
+        describe("merging one MODIFY with a MODIFY at a location nested under the prior", function() {
+            let origin = dataForms.aa;
+            let changedA = dataForms.a;
+            let changedB = dataForms.aa2;
+
+            let deltaA = jsod.diff(origin, changedA);
+            let deltaB = jsod.diff(origin, changedB);
+            let mergedDelta = jsod.mergeDeltas(deltaA, deltaB);
+
+            it('should contain no conflicts at root', function(){
+                expect(mergedDelta['!']).to.equal(undefined);
+            });
+            it('should contain no records at root', function(){
+                expect(mergedDelta['.']).to.equal(undefined);
+            });
+            it('should contain one subtree', function(){
+                expect(mergedDelta['/']).to.be.a('object');
+                expect(_.keys(mergedDelta['/'])).to.have.length(1);
+            });
+            it('should contain no deeper subtree', function(){
+                expect(mergedDelta['/']['a']['/']).to.equal(undefined);
+            });
+            it('should return one conflict of type TREE_DIFF_STRUCTURE containing copies of both DeltaTrees', function(){
+                let subtree = mergedDelta['/']['a'];
+                expect(subtree['!']).to.be.a('array');
+                expect(subtree['!']).to.have.length(1);
+
+                let record0 = subtree['!'][0];
+                expect(record0).to.be.a('object');
+                expect(record0.conflictType).to.equal(jsod.Attributes.ConflictType.TREE_DIFF_STRUCTURE);
+                expect(record0.A).to.be.a('object');
+                expect(record0.B).to.be.a('object');
+                expect(record0.A).to.deep.equal(deltaA['/']['a']);
+                expect(record0.B).to.deep.equal(deltaB['/']['a']);
+                expect(record0.A).to.not.equal(deltaA['/']['a']); //Or it is not a clone
+                expect(record0.B).to.not.equal(deltaB['/']['a']); //Or it is not a clone
+            });
+        });
+        describe("merging one DELETE with a MODIFY at a location nested under the prior", function() {
+            let origin = dataForms.aa;
+            let changedA = dataForms._;
+            let changedB = dataForms.aa2;
+
+            let deltaA = jsod.diff(origin, changedA);
+            let deltaB = jsod.diff(origin, changedB);
+            let mergedDelta = jsod.mergeDeltas(deltaA, deltaB);
+
+            it('should contain no conflicts at root', function(){
+                expect(mergedDelta['!']).to.equal(undefined);
+            });
+            it('should contain no records at root', function(){
+                expect(mergedDelta['.']).to.equal(undefined);
+            });
+            it('should contain one subtree', function(){
+                expect(mergedDelta['/']).to.be.a('object');
+                expect(_.keys(mergedDelta['/'])).to.have.length(1);
+            });
+            it('should contain no deeper subtree', function(){
+                expect(mergedDelta['/']['a']['/']).to.equal(undefined);
+            });
+            it('should return one conflict of type TREE_DIFF_STRUCTURE containing copies of both DeltaTrees', function(){
+                let subtree = mergedDelta['/']['a'];
+                expect(subtree['!']).to.be.a('array');
+                expect(subtree['!']).to.have.length(1);
+
+                let record0 = subtree['!'][0];
+                expect(record0).to.be.a('object');
+                expect(record0.conflictType).to.equal(jsod.Attributes.ConflictType.TREE_DIFF_STRUCTURE);
+                expect(record0.A).to.be.a('object');
+                expect(record0.B).to.be.a('object');
+                expect(record0.A).to.deep.equal(deltaA['/']['a']);
+                expect(record0.B).to.deep.equal(deltaB['/']['a']);
+                expect(record0.A).to.not.equal(deltaA['/']['a']); //Or it is not a clone
+                expect(record0.B).to.not.equal(deltaB['/']['a']); //Or it is not a clone
             });
         });
 
