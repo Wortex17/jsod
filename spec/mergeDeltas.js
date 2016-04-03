@@ -314,6 +314,50 @@ describe('jsod#mergeDeltas()', function() {
             'a_b2': {a: "a", b: "b2"}
         };
 
+
+        describe("merging deltaA with missing deltaB", function() {
+            let origin = dataForms._;
+            let changed = dataForms.a;
+
+            let deltaA = jsod.diff(origin, changed);
+            let deltaB = undefined;
+            let mergedDelta = jsod.mergeDeltas(deltaA, deltaB);
+
+            it('should return a copy of deltaA', function(){
+                expect(mergedDelta).to.deep.equal(deltaA);
+                expect(mergedDelta).to.not.equal(deltaA);
+                expect(mergedDelta).to.not.equal(deltaB);
+            });
+        });
+        describe("merging missing deltaA with deltaB", function() {
+            let origin = dataForms._;
+            let changed = dataForms.a;
+
+            let deltaA = undefined;
+            let deltaB = jsod.diff(origin, changed);
+            let mergedDelta = jsod.mergeDeltas(deltaA, deltaB);
+
+            it('should return a copy of deltaB', function(){
+                expect(mergedDelta).to.deep.equal(deltaB);
+                expect(mergedDelta).to.not.equal(deltaA);
+                expect(mergedDelta).to.not.equal(deltaB);
+            });
+        });
+        describe("merging missing deltaA with missing deltaB", function() {
+            let origin = dataForms._;
+            let changed = dataForms.a;
+
+            let deltaA = undefined;
+            let deltaB = undefined;
+            let mergedDelta = jsod.mergeDeltas(deltaA, deltaB);
+
+            it('should return an empty object', function(){
+                expect(mergedDelta).to.deep.equal({});
+                expect(mergedDelta).to.not.equal(deltaA);
+                expect(mergedDelta).to.not.equal(deltaB);
+            });
+        });
+
         describe("merging one ADD with one unchanged", function() {
             let origin = dataForms._;
             let changedA = dataForms.a;
