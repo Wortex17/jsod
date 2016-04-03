@@ -15,3 +15,6 @@ before_script:
 script: npm run-script test-cover
 # Send coverage data to Coveralls
 after_script: "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+
+notifications:
+  email: false
