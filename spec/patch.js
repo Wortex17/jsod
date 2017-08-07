@@ -151,6 +151,51 @@ function describeUnorderedPatchEquality(generator, readableName)
 
 function describeOrderedListPatchSuite()
 {
+    describe("patching arrays as ordered list", function() {
+
+        let diffConfig = jsod.Presets.Configs.NoUnorderedDiff;
+        let testCompilation = [
+            //These tests actually test that the structural patch also works correctly on ordered valuelists
+            [shouldMakeOeqA, 'when empty list has been set',  undefined, [], diffConfig],
+            [shouldMakeOeqA, 'when non-empty list has been set', undefined, ['a'], diffConfig],
+            [shouldMakeOeqA, 'when empty list has been deleted', [], undefined, diffConfig],
+            [shouldMakeOeqA, 'when non-empty list has been deleted', ['a'], undefined, diffConfig],
+            //The next tests are specific for ordered list diffing
+            [shouldMakeOeqA, 'when empty list was not changed', [], [], diffConfig],
+            [shouldMakeOeqA, 'when non-empty list was not changed', ['a'], ['a'], diffConfig],
+            [shouldMakeOeqA, 'when list contents were reordered', ['b', 'a'], ['a', 'b'], diffConfig],
+            [shouldMakeOeqA, 'when list contents were added to empty list', [], ['a'], diffConfig],
+            [shouldMakeOeqA, 'when list contents were added at the end', ['a'], ['a', 'b'], diffConfig],
+            [shouldMakeOeqA, 'when duplicates of list contents were added', ['a'], ['a', 'a'], diffConfig],
+            [shouldMakeOeqA, 'when list contents were deleted', ['a'], [], diffConfig],
+            [shouldMakeOeqA, 'when list contents were deleted at the end', ['a', 'b'], ['a'], diffConfig],
+            [shouldMakeOeqA, 'when one of duplicate list contents were deleted at the end', ['a', 'a'], ['a'], diffConfig],
+            [shouldMakeOeqA, 'when one of duplicate list contents aside non-dupes were deleted at the end', ['a', 'b', 'b'], ['a', 'b'], diffConfig],
+            [shouldMakeOeqA, 'when list contents were replaced', ['a'], ['b'], diffConfig],
+            [shouldMakeOeqA, 'when list contents were added at the front', ['b'], ['a', 'b'], diffConfig]
+        ];
+        describe("direct array", function() {
+            _.forEach(testCompilation, function(test){
+                test[0](test[1], test[2], test[3], 0, test[4]);
+            });
+        });
+        describe("array nested in object", function() {
+            _.forEach(testCompilation, function(test){
+                if(test[0] == shouldMakeOeqA)
+                {
+                    test[0](test[1], nest(test[2], 1), nest(test[3], 1), 1, test[4]);
+                }
+            });
+        });
+        describe("array nested in object in object", function() {
+            _.forEach(testCompilation, function(test){
+                if(test[0] == shouldMakeOeqA)
+                {
+                    test[0](test[1], nest(test[2], 2), nest(test[3], 2), 2, test[4]);
+                }
+            });
+        });
+    });
     describe("patching buffers as ordered list", function() {
 
         let testCompilation = [
@@ -241,11 +286,11 @@ function describeOrderedListPatchSuite()
     });
 
 
-    function shouldMakeOeqA(contextDesc, O, A)
+    function shouldMakeOeqA(contextDesc, O, A, depth, diffMethod)
     {
         context(contextDesc, function () {
             it("should make O deep equal to A", function(){
-                let diff = jsod.diff(O, A);
+                let diff = jsod.diff(O, A, diffMethod);
                 let patched = jsod.patch(O, diff);
                 expect(patched).to.deep.equal(A);
             });
