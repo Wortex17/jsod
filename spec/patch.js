@@ -167,10 +167,10 @@ function describeOrderedListPatchSuite()
             [shouldMakeOeqA, 'when list contents were added to empty list', [], ['a'], diffConfig],
             [shouldMakeOeqA, 'when list contents were added at the end', ['a'], ['a', 'b'], diffConfig],
             [shouldMakeOeqA, 'when duplicates of list contents were added', ['a'], ['a', 'a'], diffConfig],
-            [shouldMakeOeqA, 'when list contents were deleted', ['a'], [], diffConfig],
-            [shouldMakeOeqA, 'when list contents were deleted at the end', ['a', 'b'], ['a'], diffConfig],
-            [shouldMakeOeqA, 'when one of duplicate list contents were deleted at the end', ['a', 'a'], ['a'], diffConfig],
-            [shouldMakeOeqA, 'when one of duplicate list contents aside non-dupes were deleted at the end', ['a', 'b', 'b'], ['a', 'b'], diffConfig],
+            [shouldMakeOeqACleaned, 'when list contents were deleted', ['a'], [], diffConfig],
+            [shouldMakeOeqACleaned, 'when list contents were deleted at the end', ['a', 'b'], ['a'], diffConfig],
+            [shouldMakeOeqACleaned, 'when one of duplicate list contents were deleted at the end', ['a', 'a'], ['a'], diffConfig],
+            [shouldMakeOeqACleaned, 'when one of duplicate list contents aside non-dupes were deleted at the end', ['a', 'b', 'b'], ['a', 'b'], diffConfig],
             [shouldMakeOeqA, 'when list contents were replaced', ['a'], ['b'], diffConfig],
             [shouldMakeOeqA, 'when list contents were added at the front', ['b'], ['a', 'b'], diffConfig]
         ];
@@ -292,6 +292,23 @@ function describeOrderedListPatchSuite()
             it("should make O deep equal to A", function(){
                 let diff = jsod.diff(O, A, diffMethod);
                 let patched = jsod.patch(O, diff);
+                expect(patched).to.deep.equal(A);
+            });
+        });
+    }
+
+    function shouldMakeOeqACleaned(contextDesc, O, A, depth, diffMethod)
+    {
+        context(contextDesc, function () {
+            it("should not make O deep equal to A", function(){
+                let diff = jsod.diff(O, A, diffMethod);
+                let patched = jsod.patch(O, diff);
+                expect(patched).to.not.deep.equal(A);
+            });
+            it("should make O deep equal to A with all empty elements removed", function(){
+                let diff = jsod.diff(O, A, diffMethod);
+                let patched = jsod.patch(O, diff);
+                patched = _.without(patched, undefined);
                 expect(patched).to.deep.equal(A);
             });
         });
