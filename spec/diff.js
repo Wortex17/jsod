@@ -331,7 +331,7 @@ function describeOrderedListDiffSuite()
                 let sub = diff['/'][key];
 
                 it('should have a key name that shows an index beyond the size of the original list', function() {
-                    expect(key).to.be.at.least(_.size(O));
+                    expect(Number(key)).to.be.at.least(_.size(O));
                 });
                 it('should return a DiffTree object', function() {
                     expect(sub).to.be.a('object');
@@ -380,7 +380,7 @@ function describeOrderedListDiffSuite()
                 let sub = diff['/'][key];
 
                 it('should have a key name that shows an index in bounds of the original list', function() {
-                    expect(key).to.be.below(_.size(O));
+                    expect(Number(key)).to.be.below(_.size(O));
                 });
                 it('should return a DiffTree object', function() {
                     expect(sub).to.be.a('object');
@@ -412,7 +412,7 @@ function describeOrderedListDiffSuite()
                 let sub = diff['/'][key];
 
                 it('should have a key name that shows an index beyond the size of the original list', function() {
-                    expect(key).to.be.at.least(_.size(O));
+                    expect(Number(key)).to.be.at.least(_.size(O));
                 });
                 it('should return a DiffTree object', function() {
                     expect(sub).to.be.a('object');
@@ -465,7 +465,7 @@ function describeOrderedListDiffSuite()
                 let sub = diff['/'][key];
 
                 it('should have a key name that shows an index beyond the size of the new list', function() {
-                    expect(key).to.be.at.least(_.size(A));
+                    expect(Number(key)).to.be.at.least(_.size(A));
                 });
                 it('should return a DiffTree object', function() {
                     expect(sub).to.be.a('object');
